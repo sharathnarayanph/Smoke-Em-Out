@@ -2,7 +2,7 @@ package com.smoke.GameState;
 
 public abstract class GameState {
 	
-	protected GameStateManager gameState;
+	protected GameStateManager stateManager;
 	
 	public abstract void init();
 	public abstract void update();
