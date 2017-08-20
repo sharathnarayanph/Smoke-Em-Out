@@ -3,13 +3,18 @@ package com.smoke.Hero;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+
 import javax.imageio.ImageIO;
-import com.smoke.Render.*;
+
+import com.smoke.Attacks.FireBall;
+import com.smoke.Render.Animation;
+import com.smoke.Render.Render;
+import com.smoke.Villain.Villain;
 import com.smoke.WorldMap.TileMap;
 
 public class Hero extends Render {
 	
-	// player stuff
+	// Player Attributes
 	private int health;
 	private int maxHealth;
 	private int fire;
@@ -18,32 +23,31 @@ public class Hero extends Render {
 	private boolean flinching;
 	private long flinchTimer;
 	
-//	// fireball
-//	private boolean firing;
-//	private int fireCost;
-//	private int fireBallDamage;
-//	private ArrayList<FireBall> fireBalls;
+	// Power Configuration
+	private boolean firing;
+	private int fireCost;
+	private int fireBallDamage;
+	private ArrayList<FireBall> fireBalls;
 	
-	// scratch
+	// Body Attack
 	private boolean scratching;
 	private int scratchDamage;
 	private int scratchRange;
 	
-	// gliding
+	// Flight
 	private boolean gliding;
 	
-	// animations
+	// Animation
 	private ArrayList<BufferedImage[]> sprites;
 	private final int[] numFrames = {
 		2, 8, 1, 2, 4, 2, 5
 	};
 	
-	// animation actions
 	private static final int IDLE = 0;
 	private static final int WALKING = 1;
 	private static final int JUMPING = 2;
 	private static final int FALLING = 3;
-	private static final int GLIDING = 4;
+	private static final int FLYING = 4;
 	private static final int FIREBALL = 5;
 	private static final int SCRATCHING = 6;
 	
@@ -69,42 +73,29 @@ public class Hero extends Render {
 		health = maxHealth = 5;
 		fire = maxFire = 2500;
 		
+		fireCost = 200;
+		fireBallDamage = 5;
+		fireBalls = new ArrayList<FireBall>();
+		
 		scratchDamage = 8;
 		scratchRange = 40;
 		
-		// load sprites
 		try {
 			
 			BufferedImage spritesheet = ImageIO.read(
-				getClass().getResourceAsStream(
-					"/Sprites/Player/playersprites.gif"
-				)
-			);
+				getClass().getResourceAsStream("/Sprites/Player/playersprites.gif"));
 			
 			sprites = new ArrayList<BufferedImage[]>();
 			for(int i = 0; i < 7; i++) {
 				
-				BufferedImage[] bi =
-					new BufferedImage[numFrames[i]];
+				BufferedImage[] bi = new BufferedImage[numFrames[i]];
 				
 				for(int j = 0; j < numFrames[i]; j++) {
 					
-					if(i != SCRATCHING) {
-						bi[j] = spritesheet.getSubimage(
-								j * width,
-								i * height,
-								width,
-								height
-						);
-					}
-					else {
-						bi[j] = spritesheet.getSubimage(
-								j * width * 2,
-								i * height,
-								width * 2,
-								height
-						);
-					}
+					if(i != SCRATCHING) 
+						bi[j] = spritesheet.getSubimage(j * width, i * height, width, height);
+					else 
+						bi[j] = spritesheet.getSubimage(j * width * 2, i * height, width * 2, height);
 					
 				}
 				
@@ -129,7 +120,9 @@ public class Hero extends Render {
 	public int getFire() { return fire; }
 	public int getMaxFire() { return maxFire; }
 	
-
+	public void setFiring() { 
+		firing = true;
+	}
 	public void setScratching() {
 		scratching = true;
 	}
@@ -137,6 +130,39 @@ public class Hero extends Render {
 		gliding = b;
 	}
 	
+	public void checkAttack(ArrayList<Villain> enemies) {
+		
+		for(int i = 0; i < enemies.size(); i++) {
+			
+			Villain e = enemies.get(i);
+			
+			if(scratching) {
+				if(facingRight) {
+					if(e.getx() > x && e.getx() < x + scratchRange &&  
+							e.gety() > y - height / 2 && e.gety() < y + height / 2)
+						e.hit(scratchDamage);
+				}
+				else {
+					if(e.getx() < x && e.getx() > x - scratchRange && e.gety() > y - height / 2 &&
+						e.gety() < y + height / 2) 
+						e.hit(scratchDamage);
+				}
+			}
+			
+			for(int j = 0; j < fireBalls.size(); j++) {
+				if(fireBalls.get(j).intersects(e)) {
+					e.hit(fireBallDamage);
+					fireBalls.get(j).setHit();
+					break;
+				}
+			}
+			
+			if(intersects(e))
+				hit(e.getDamage());
+			
+		}
+		
+	}
 	
 	public void hit(int damage) {
 		if(flinching) return;
@@ -149,40 +175,32 @@ public class Hero extends Render {
 	
 	private void getNextPosition() {
 		
-		// movement
 		if(left) {
 			dx -= moveSpeed;
-			if(dx < -maxSpeed) {
+			if(dx < -maxSpeed)
 				dx = -maxSpeed;
-			}
 		}
 		else if(right) {
 			dx += moveSpeed;
-			if(dx > maxSpeed) {
+			if(dx > maxSpeed) 
 				dx = maxSpeed;
-			}
 		}
 		else {
 			if(dx > 0) {
 				dx -= stopSpeed;
-				if(dx < 0) {
+				if(dx < 0) 
 					dx = 0;
-				}
 			}
 			else if(dx < 0) {
 				dx += stopSpeed;
-				if(dx > 0) {
+				if(dx > 0) 
 					dx = 0;
-				}
 			}
 		}
 		
-		// cannot move while attacking, except in air
-		if(
-		(currentAction == SCRATCHING || currentAction == FIREBALL) &&
-		!(jumping || falling)) {
+		if((currentAction == SCRATCHING || currentAction == FIREBALL) &&
+		!(jumping || falling))
 			dx = 0;
-		}
 		
 		// jumping
 		if(jumping && !falling) {
@@ -207,17 +225,36 @@ public class Hero extends Render {
 	
 	public void update() {
 		
-		// update position
 		getNextPosition();
 		checkTileMapCollision();
 		setPosition(xtemp, ytemp);
 		
-		// check attack has stopped
 		if(currentAction == SCRATCHING) {
 			if(animation.hasPlayedOnce()) scratching = false;
 		}
+		if(currentAction == FIREBALL) {
+			if(animation.hasPlayedOnce()) firing = false;
+		}
 		
-		// check done flinching
+		fire += 1;
+		if(fire > maxFire) fire = maxFire;
+		if(firing && currentAction != FIREBALL) {
+			if(fire > fireCost) {
+				fire -= fireCost;
+				FireBall fb = new FireBall(tileMap, facingRight);
+				fb.setPosition(x, y);
+				fireBalls.add(fb);
+			}
+		}
+		
+		for(int i = 0; i < fireBalls.size(); i++) {
+			fireBalls.get(i).update();
+			if(fireBalls.get(i).shouldRemove()) {
+				fireBalls.remove(i);
+				i--;
+			}
+		}
+
 		if(flinching) {
 			long elapsed =
 				(System.nanoTime() - flinchTimer) / 1000000;
@@ -225,8 +262,7 @@ public class Hero extends Render {
 				flinching = false;
 			}
 		}
-		
-		// set animation
+
 		if(scratching) {
 			if(currentAction != SCRATCHING) {
 				currentAction = SCRATCHING;
@@ -235,11 +271,19 @@ public class Hero extends Render {
 				width = 60;
 			}
 		}
+		else if(firing) {
+			if(currentAction != FIREBALL) {
+				currentAction = FIREBALL;
+				animation.setFrames(sprites.get(FIREBALL));
+				animation.setDelay(100);
+				width = 30;
+			}
+		}
 		else if(dy > 0) {
 			if(gliding) {
-				if(currentAction != GLIDING) {
-					currentAction = GLIDING;
-					animation.setFrames(sprites.get(GLIDING));
+				if(currentAction != FLYING) {
+					currentAction = FLYING;
+					animation.setFrames(sprites.get(FLYING));
 					animation.setDelay(100);
 					width = 30;
 				}
@@ -278,7 +322,6 @@ public class Hero extends Render {
 		
 		animation.update();
 		
-		// set direction
 		if(currentAction != SCRATCHING && currentAction != FIREBALL) {
 			if(right) facingRight = true;
 			if(left) facingRight = false;
@@ -290,15 +333,15 @@ public class Hero extends Render {
 		
 		setMapPosition();
 		
-	
+		for(int i = 0; i < fireBalls.size(); i++) {
+			fireBalls.get(i).draw(g);
+		}
 		
-		// draw player
 		if(flinching) {
 			long elapsed =
 				(System.nanoTime() - flinchTimer) / 1000000;
-			if(elapsed / 100 % 2 == 0) {
+			if(elapsed / 100 % 2 == 0) 
 				return;
-			}
 		}
 		
 		super.draw(g);
@@ -306,3 +349,20 @@ public class Hero extends Render {
 	}
 	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
