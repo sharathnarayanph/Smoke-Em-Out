@@ -1,6 +1,7 @@
 package com.smoke.GameState;
 
 import java.util.ArrayList;
+import com.smoke.Worlds.*;
 
 public class GameStateManager {
 	
@@ -8,6 +9,7 @@ public class GameStateManager {
 	private int currentState;
 	
 	public static final int LOADPAGESTATE = 0;
+	public static final int NAMEK = 1;
 	
 	public GameStateManager() {
 		
@@ -15,6 +17,7 @@ public class GameStateManager {
 		
 		currentState = LOADPAGESTATE;
 		gameStates.add(new LoadPageState(this));
+		gameStates.add(new PlanetNamek(this));
 	}
 	
 	public void setState(int state) {
@@ -30,12 +33,12 @@ public class GameStateManager {
 		gameStates.get(currentState).draw(g);
 	}
 	
-	public void keyPressed(int k) {
-		gameStates.get(currentState).keyPressed(k);
+	public void keyPressed(int key) {
+		gameStates.get(currentState).keyPressed(key);
 	}
 	
-	public void keyReleased(int k) {
-		gameStates.get(currentState).keyReleased(k);
+	public void keyReleased(int key) {
+		gameStates.get(currentState).keyReleased(key);
 	}
 	
 }

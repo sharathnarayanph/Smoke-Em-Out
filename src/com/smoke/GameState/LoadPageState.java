@@ -64,11 +64,15 @@ private Background bg;
 	}
 	
 	private void select() {
-		if(choice == 0) {
-			//
-		}
-		if(choice == 1) {
-			System.exit(0);
+
+		switch(choice)
+		{
+			case 0: stateManager.setState(GameStateManager.NAMEK);
+					break;
+			case 1: System.exit(0);
+					break;
+			default: System.exit(0);
+					 break;
 		}
 	}
 	
