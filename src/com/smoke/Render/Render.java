@@ -39,7 +39,7 @@ public abstract class Render {
 	protected boolean bottomRight;
 	
 	// animation
-	//protected Animation animation;
+	protected Animation animation;
 	protected int currentAction;
 	protected int previousAction;
 	protected boolean facingRight;
