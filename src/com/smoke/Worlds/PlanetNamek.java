@@ -108,8 +108,9 @@ public class PlanetNamek extends GameState {
 		
 		player.draw(g);
 		
-		for(int i = 0; i < enemies.size(); i++)
+		for(int i = 0; i < enemies.size(); i++){
 			enemies.get(i).draw(g);
+		}
 
 		for(int i = 0; i < explosions.size(); i++) {
 			explosions.get(i).setMapPosition(
