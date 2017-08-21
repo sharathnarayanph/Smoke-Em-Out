@@ -58,23 +58,24 @@ public class GamePanel extends JPanel
 		long wait;
 		
 		while(running) {
+			try {				
 			
-			start = System.nanoTime();
+				start = System.nanoTime();
 			
-			update();
-			draw();
-			drawToScreen();
+				update();
+				draw();
+				drawToScreen();
 			
-			elapsed = System.nanoTime() - start;
+				elapsed = System.nanoTime() - start;
 			
-			wait = targetTime - elapsed / 1000000;
-			if(wait < 0) wait = 5;
+				wait = targetTime - elapsed / 1000000;
+				if(wait < 0) wait = 5;
 			
-			try {
 				Thread.sleep(wait);
 			}
 			catch(Exception e) {
 				e.printStackTrace();
+				run();
 			}
 			
 		}
