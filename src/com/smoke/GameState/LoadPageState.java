@@ -27,7 +27,7 @@ private Background bg;
 			bg = new Background("/Backgrounds/menubg.gif", 1);
 			bg.setVector(-0.1, 0);
 			
-			titleColor = new Color(128, 0, 0);
+			titleColor = Color.BLACK;
 			titleFont = new Font("Century Gothic", Font.PLAIN, 28);
 			optionFont = new Font("Arial", Font.PLAIN, 12);
 			
@@ -50,14 +50,15 @@ private Background bg;
 		
 		g.setColor(titleColor);
 		g.setFont(titleFont);
-		g.drawString("Smoke 'em Out!", 50, 70);
+		g.drawString("Dragon Ball", 50, 70);
+		g.drawString("Smoke 'em Out", 50, 100);
 		
 		g.setFont(optionFont);
 		for(int i = 0; i < options.length; i++) {
 			if(i == choice)
-				g.setColor(Color.BLACK);
+				g.setColor(Color.YELLOW);
 			else 
-				g.setColor(Color.RED);
+				g.setColor(Color.BLACK);
 			g.drawString(options[i], 145, 140 + i * 15);
 		}
 		
