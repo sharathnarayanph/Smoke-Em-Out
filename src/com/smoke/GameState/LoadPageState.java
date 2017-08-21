@@ -24,7 +24,7 @@ private Background bg;
 		
 		try {
 			
-			bg = new Background("/Backgrounds/menubg.gif", 1);
+			bg = new Background("/Backgrounds/load.gif", 1);
 			bg.setVector(-0.1, 0);
 			
 			titleColor = Color.BLACK;

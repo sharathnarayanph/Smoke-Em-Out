@@ -36,7 +36,7 @@ public class PlanetNamek extends GameState {
 		tileMap.setPosition(0, 0);
 		tileMap.setTween(1);
 		
-		bg = new Background("/Backgrounds/grassbg1.gif", 0.1);
+		bg = new Background("/Backgrounds/namek.gif", 0.1);
 		
 		player = new Hero(tileMap);
 		player.setPosition(100, 100);

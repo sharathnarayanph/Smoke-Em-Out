@@ -83,7 +83,7 @@ public class Hero extends Render {
 		try {
 			
 			BufferedImage spritesheet = ImageIO.read(
-				getClass().getResourceAsStream("/Sprites/Player/playersprites.gif"));
+				getClass().getResourceAsStream("/Sprites/Player/majinbuu.gif"));
 			
 			sprites = new ArrayList<BufferedImage[]>();
 			for(int i = 0; i < 7; i++) {
